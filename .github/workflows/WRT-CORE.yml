@@ -91,6 +91,7 @@ jobs:
           echo "WRT_TARGET=$(grep -m 1 -oP '^CONFIG_TARGET_\K[\w]+(?=\=y)' ./Config/$WRT_CONFIG.txt)" >> $GITHUB_ENV
           echo "WRT_KVER=none" >> $GITHUB_ENV
           echo "WRT_LIST=none" >> $GITHUB_ENV
+          echo "WRT_MODS=none" >> $GITHUB_ENV
 
       - name: Clone Code
         run: |
@@ -248,7 +249,8 @@ jobs:
           if [[ $WRT_TEST != 'true' ]]; then
             echo "WRT_KVER=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^kernel - \K[\d\.]+' {} \; | head -1)" >> $GITHUB_ENV
             echo "WRT_LIST=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | sort -u | tr '\n' ' ')" >> $GITHUB_ENV
-
+            # 获取已编译固件（CONFIG_PACKAGE_xxx=m）
+            echo "WRT_MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')" >> $GITHUB_ENV
             # 直接打包整个bin目录
             [ -d ./bin/ ] && tar -czf ./upload/openwrt-"$WRT_INFO"-"$WRT_BRANCH"-"$WRT_DATE".tar.gz -C . bin/
 
@@ -277,4 +279,5 @@ jobs:
             WIFI密码：${{env.WRT_WORD}}
 
             内核版本：${{env.WRT_KVER}}
-            插件列表：${{env.WRT_LIST}}
+            固件已集成插件：${{env.WRT_LIST}}
+            已编译未集成的插件：${{env.WRT_MODS}}
