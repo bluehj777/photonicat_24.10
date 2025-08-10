@@ -79,6 +79,7 @@ UPDATE_PACKAGE "luci-mod-photonicatstatus" "ntbowen/luci-mod-photonicatstatus" "
 UPDATE_VERSION() {
 	local PKG_NAME=$1
 	local PKG_MARK=${2:-false}
+	local TARGET_VERSION=$3  # 新增：目标版本参数
 	local PKG_FILES=$(find ./ ../feeds/packages/ -maxdepth 3 -type f -wholename "*/$PKG_NAME/Makefile")
 
 	if [ -z "$PKG_FILES" ]; then
@@ -90,7 +91,15 @@ UPDATE_VERSION() {
 
 	for PKG_FILE in $PKG_FILES; do
 		local PKG_REPO=$(grep -Po "PKG_SOURCE_URL:=https://.*github.com/\K[^/]+/[^/]+(?=.*)" $PKG_FILE)
-		local PKG_TAG=$(curl -sL "https://api.github.com/repos/$PKG_REPO/releases" | jq -r "map(select(.prerelease == $PKG_MARK)) | first | .tag_name")
+		
+		# 如果指定了目标版本，使用指定版本；否则获取最新版本
+		if [ -n "$TARGET_VERSION" ]; then
+			local PKG_TAG="v$TARGET_VERSION"
+			local NEW_VER="$TARGET_VERSION"
+		else
+			local PKG_TAG=$(curl -sL "https://api.github.com/repos/$PKG_REPO/releases" | jq -r "map(select(.prerelease == $PKG_MARK)) | first | .tag_name")
+			local NEW_VER=$(echo $PKG_TAG | sed -E 's/[^0-9]+/\./g; s/^\.|\.$//g')
+		fi
 
 		local OLD_VER=$(grep -Po "PKG_VERSION:=\K.*" "$PKG_FILE")
 		local OLD_URL=$(grep -Po "PKG_SOURCE_URL:=\K.*" "$PKG_FILE")
@@ -99,23 +108,25 @@ UPDATE_VERSION() {
 
 		local PKG_URL=$([[ "$OLD_URL" == *"releases"* ]] && echo "${OLD_URL%/}/$OLD_FILE" || echo "${OLD_URL%/}")
 
-		local NEW_VER=$(echo $PKG_TAG | sed -E 's/[^0-9]+/\./g; s/^\.|\.$//g')
+																		
 		local NEW_URL=$(echo $PKG_URL | sed "s/\$(PKG_VERSION)/$NEW_VER/g; s/\$(PKG_NAME)/$PKG_NAME/g")
 		local NEW_HASH=$(curl -sL "$NEW_URL" | sha256sum | cut -d ' ' -f 1)
 
 		echo "old version: $OLD_VER $OLD_HASH"
-		echo "new version: $NEW_VER $NEW_HASH"
+		echo "target version: $NEW_VER $NEW_HASH"
 
-		if [[ "$NEW_VER" =~ ^[0-9].* ]] && dpkg --compare-versions "$OLD_VER" lt "$NEW_VER"; then
+		# 如果指定了目标版本，直接更新到目标版本；否则只在新版本更高时更新
+		if [ -n "$TARGET_VERSION" ] || ([[ "$NEW_VER" =~ ^[0-9].* ]] && dpkg --compare-versions "$OLD_VER" lt "$NEW_VER"); then
 			sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=$NEW_VER/g" "$PKG_FILE"
 			sed -i "s/PKG_HASH:=.*/PKG_HASH:=$NEW_HASH/g" "$PKG_FILE"
-			echo "$PKG_FILE version has been updated!"
+			echo "$PKG_FILE version has been updated to $NEW_VER!"
 		else
 			echo "$PKG_FILE version is already the latest!"
 		fi
 	done
 }
 
-#UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否"
-UPDATE_VERSION "sing-box"
-UPDATE_VERSION "tailscale"
+# 在脚本末尾，修改sing-box的调用
+#UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否" "指定版本，可选"
+UPDATE_VERSION "sing-box" "false" "1.11.15"  # 指定更新到1.11.15版本
+UPDATE_VERSION "tailscale"  # tailscale保持更新到最新版本
