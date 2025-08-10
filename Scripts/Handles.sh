@@ -24,16 +24,21 @@ if [ -d *"homeproxy"* ]; then
 	cd $PKG_PATH && echo "homeproxy date has been updated!"
 fi
 
-#修改argon主题字体和颜色
-if [ -d *"luci-theme-argon"* ]; then
-	echo " "
+#修改argon主题颜色
+ARGON_CSS_FILE=$(find ./ -type f -path "*/luci-theme-argon/htdocs/luci-static/argon/css/cascade.css")
+if [ -f "$ARGON_CSS_FILE" ]; then
+	sed -i "s/#483d8b/#31a1a1/" $ARGON_CSS_FILE
+	cd $PKG_PATH && echo "Theme argon color has been fixed!"
+fi
 
-	cd ./luci-theme-argon/
-
-	sed -i "/font-weight:/ { /important/! { /\/\*/! s/:.*/: var(--font-weight);/ } }" $(find ./luci-theme-argon -type f -iname "*.css")
-	sed -i "s/primary '.*'/primary '#31a1a1'/; s/'0.2'/'0.5'/; s/'none'/'bing'/; s/'600'/'normal'/" ./luci-app-argon-config/root/etc/config/argon
-
-	cd $PKG_PATH && echo "theme-argon has been fixed!"
+#修改argon主题背景为空白
+ARGON_BG_FILE=$(find ./ -type f -path "*/luci-theme-argon/htdocs/luci-static/argon/img/bg.webp" | head -1)
+if [ -f "$ARGON_BG_FILE" ]; then
+    ARGON_DIR=$(dirname "$ARGON_BG_FILE")
+    if [ -f "$ARGON_DIR/blank.png" ]; then
+        cp "$ARGON_DIR/blank.png" "$ARGON_BG_FILE"
+        cd $PKG_PATH && echo "Theme argon bg has been fixed!"
+    fi
 fi
 
 #修改qca-nss-drv启动顺序
@@ -64,6 +69,20 @@ if [ -f "$TS_FILE" ]; then
 	sed -i '/\/files/d' $TS_FILE
 
 	cd $PKG_PATH && echo "tailscale has been fixed!"
+fi
+
+#修复Socat配置文件冲突
+SOCAT_FILE=$(find ../feeds/packages/ -maxdepth 3 -type f -wholename "*/socat/Makefile")
+if [ -f "$SOCAT_FILE" ]; then
+	sed -i '/\/files/d' $SOCAT_FILE
+	cd $PKG_PATH && echo "socat has been fixed!"
+fi
+
+#修复ddns日志无法滚动问题
+DDNS_OVERVIEW_FILE=$(find ./ ../feeds/luci/ -type f -path "*/luci-app-ddns/htdocs/luci-static/resources/view/ddns/overview.js")
+if [ -f "$DDNS_OVERVIEW_FILE" ]; then
+	sed -i "s/'textarea', { 'style': 'width:100%;/'textarea', { 'style': 'width:100%; overflow-y:auto;/" $DDNS_OVERVIEW_FILE
+	cd $PKG_PATH && echo "DDNS log display has been fixed!"
 fi
 
 #修复Rust编译失败
