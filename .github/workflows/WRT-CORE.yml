@@ -264,7 +264,8 @@ jobs:
           files: ./wrt/upload/*.*
           body: |
             这是ROCKCHIP平台Ariaboard Photonicat 光影猫固件包！
-
+            已集成QWRT模组管理(来自https://github.com/FUjr/QModem)
+            
             源码：${{env.WRT_REPO}}
             分支：${{env.WRT_BRANCH}}
             提交：${{env.WRT_HASH}}
