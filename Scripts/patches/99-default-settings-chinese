@@ -1,0 +1,9 @@
+cat << "EOF" > /etc/opkg/distfeeds.conf
+src/gz immortalwrt_base https://mirrors.pku.edu.cn/immortalwrt/releases/packages-24.10/aarch64_generic/base
+src/gz immortalwrt_luci https://mirrors.pku.edu.cn/immortalwrt/releases/packages-24.10/aarch64_generic/luci
+src/gz immortalwrt_packages https://mirrors.pku.edu.cn/immortalwrt/releases/packages-24.10/aarch64_generic/packages
+src/gz immortalwrt_routing https://mirrors.pku.edu.cn/immortalwrt/releases/packages-24.10/aarch64_generic/routing
+src/gz immortalwrt_telephony https://mirrors.pku.edu.cn/immortalwrt/releases/packages-24.10/aarch64_generic/telephony
+EOF
+# 注释掉 opkg.conf 中的签名检查选项
+sed -i 's/^option check_signature/#option check_signature/' /etc/opkg.conf
