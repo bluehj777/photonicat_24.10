@@ -141,21 +141,21 @@ CONFIG_PACKAGE_usbutils=y
 
 #我添加的组件
 
-CONFIG_PACKAGE_nftables=y
-CONFIG_PACKAGE_kmod-nft-conntrack=m
-CONFIG_PACKAGE_kmod-nft-limit=m
-CONFIG_PACKAGE_kmod-nft-hash=m 
-CONFIG_PACKAGE_iptables-nft=m
-CONFIG_PACKAGE_ip6tables-nft=m
-CONFIG_PACKAGE_arptables-nft=m
-CONFIG_PACKAGE_ebtables-nft=m
+#CONFIG_PACKAGE_nftables=y
+#CONFIG_PACKAGE_kmod-nft-conntrack=m
+#CONFIG_PACKAGE_kmod-nft-limit=m
+#CONFIG_PACKAGE_kmod-nft-hash=m 
+#CONFIG_PACKAGE_iptables-nft=m
+#CONFIG_PACKAGE_ip6tables-nft=m
+#CONFIG_PACKAGE_arptables-nft=m
+#CONFIG_PACKAGE_ebtables-nft=m
 
-CONFIG_PACKAGE_kmod-iptunnel=m
-CONFIG_PACKAGE_kmod-iptunnel4=m
-CONFIG_PACKAGE_kmod-iptunnel6=m
-CONFIG_PACKAGE_kmod-ipsec=m
-CONFIG_PACKAGE_kmod-ipsec4=m
-CONFIG_PACKAGE_kmod-ipsec6=m
+#CONFIG_PACKAGE_kmod-iptunnel=m
+#CONFIG_PACKAGE_kmod-iptunnel4=m
+#CONFIG_PACKAGE_kmod-iptunnel6=m
+#CONFIG_PACKAGE_kmod-ipsec=m
+#CONFIG_PACKAGE_kmod-ipsec4=m
+#CONFIG_PACKAGE_kmod-ipsec6=m
 
 CONFIG_PACKAGE_curl=y
 CONFIG_PACKAGE_wget-ssl=y
