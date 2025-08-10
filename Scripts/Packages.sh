@@ -72,8 +72,8 @@ UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 
 #UPDATE_PACKAGE "luci-app-advancedplus" "bluehj777/openwrt_pkgs" "main" "pkg"
 UPDATE_PACKAGE "luci-app-onliner" "bluehj777/openwrt_pkgs" "main" "pkg"
-UPDATE_PACKAGE "pcat-manager" "ntbowen/pcat-manager" "main"
-UPDATE_PACKAGE "luci-mod-photonicatstatus" "ntbowen/luci-mod-photonicatstatus" "main"
+#UPDATE_PACKAGE "pcat-manager" "ntbowen/pcat-manager" "main"
+#UPDATE_PACKAGE "luci-mod-photonicatstatus" "ntbowen/luci-mod-photonicatstatus" "main"
 
 #更新软件包版本
 UPDATE_VERSION() {
