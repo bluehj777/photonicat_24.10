@@ -260,7 +260,7 @@ jobs:
             done
             
             # 直接打包整个bin目录
-            [ -d ./bin/ ] && tar -czf ./upload/immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME-"$WRT_DATE".tar.gz -C . bin/
+            [ -d ./bin/ ] && tar -czf ./upload/immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".tar.gz -C . bin/
 
             make clean -j$(nproc)
           fi
