@@ -253,15 +253,14 @@ jobs:
             echo "WRT_MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')" >> $GITHUB_ENV
 
             # 复制固件文件到upload目录并重命名
-            find ./bin/targets/ -type f \( -name "*.img.gz" -o -name "*.bin" -o -name "*.img" \) | while read -r FILE; do
-              EXT="${FILE##*.}"
-              NEW_NAME="immortalwrt-$WRT_INFO-$WRT_BRANCH-$WRT_DATE.$EXT"
-              cp "$FILE" "./upload/$NEW_NAME"
+            for FILE in $(find ./bin/targets/ -type f -iname "*$WRT_TARGET*") ; do
+              EXT=$(basename $FILE | cut -d '.' -f 2-)
+              NAME=$(basename $FILE | cut -d '.' -f 1 | grep -io "\($WRT_TARGET\).*")
+              NEW_FILE="$WRT_INFO"-"$WRT_BRANCH"-"$NAME"-"$WRT_DATE"."$EXT"
+              mv -f $FILE ./upload/$NEW_FILE
             done
-            
-            # 直接打包整个bin目录
-            [ -d ./bin/ ] && tar -czf ./upload/immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".tar.gz -C . bin/
 
+            find ./bin/targets/ -type f -exec mv -f {} ./upload/ \;
             make clean -j$(nproc)
           fi
 
