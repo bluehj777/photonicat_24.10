@@ -113,25 +113,6 @@ jobs:
         id: check-cache
         if: env.WRT_TEST != 'true'
         uses: actions/cache@main
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         with:
           key: ${{env.WRT_CONFIG}}-${{env.WRT_INFO}}-${{env.WRT_HASH}}
           restore-keys: ${{env.WRT_CONFIG}}-${{env.WRT_INFO}}
@@ -221,38 +202,18 @@ jobs:
         run: |
           cd ./wrt/ && mkdir -p ./upload/
           cp -f ./.config ./upload/Config-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".txt
-          
+
           if [[ $WRT_TEST != 'true' ]]; then
-            # 分步处理，避免复杂的嵌套
-            KVER=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^kernel - \K[\d\.]+' {} \; | head -1)
-            echo "WRT_KVER=${KVER:-none}" >> $GITHUB_ENV
-            
-            LIST=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | sort -u | tr '\n' ' ')
-            echo "WRT_LIST=${LIST:-none}" >> $GITHUB_ENV
-            
+            echo "WRT_KVER=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^kernel - \K[\d\.]+' {} \; | head -1)" >> $GITHUB_ENV
+            echo "WRT_LIST=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | sort -u | tr '\n' ' ')" >> $GITHUB_ENV
             # 获取已编译固件（CONFIG_PACKAGE_xxx=m）
-            MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')
-            echo "WRT_MODS=${MODS:-none}" >> $GITHUB_ENV
-            
-            # 复制固件文件到upload目录并重命名
-            for FILE in ./bin/targets/*/*/*.{img.gz,bin,img} 2>/dev/null; do
-              [ -f "$FILE" ] || continue
-              
-              BASENAME=$(basename "$FILE")
-              # 保留原始文件的关键词
-              TYPE=$(echo "$BASENAME" | grep -oE "(sysupgrade|factory|squashfs|ext4|rootfs)" || echo "firmware")
-              
-              # 更安全的扩展名提取
-              case "$BASENAME" in
-                *.img.gz) EXT="img.gz" ;;
-                *.tar.gz) EXT="tar.gz" ;;
-                *.bin)    EXT="bin" ;;
-                *.img)    EXT="img" ;;
-                *)        EXT="${BASENAME##*.}" ;;  # 兜底方案
-              esac
-              
-              NEW_NAME="immortalwrt-$WRT_INFO-$TYPE-$WRT_DATE.$EXT"
-              cp "$FILE" "./upload/$NEW_NAME"
+            echo "WRT_MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')" >> $GITHUB_ENV
+
+            for FILE in $(find ./bin/targets/ -type f -iname "*$WRT_TARGET*") ; do
+              EXT=$(basename $FILE | cut -d '.' -f 2-)
+              NAME=$(basename $FILE | cut -d '.' -f 1 | grep -io "\($WRT_TARGET\).*")
+              NEW_FILE=immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE"."$EXT"
+              mv -f $FILE ./upload/$NEW_FILE
             done
             
             # 直接打包整个bin目录
