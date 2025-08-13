@@ -209,13 +209,26 @@ jobs:
             # 获取已编译固件（CONFIG_PACKAGE_xxx=m）
             echo "WRT_MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')" >> $GITHUB_ENV
 
-            for FILE in $(find ./bin/targets/ -type f -iname "*$WRT_TARGET*") ; do
-              EXT=$(basename $FILE | cut -d '.' -f 2-)
-              NAME=$(basename $FILE | cut -d '.' -f 1 | grep -io "\($WRT_TARGET\).*")
-              NEW_FILE=immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE"."$EXT"
-              mv -f $FILE ./upload/$NEW_FILE
+            # 复制所有固件文件，保留部分原始文件名
+            for FILE in ./bin/targets/*/*/*.{img.gz,bin,img} 2>/dev/null; do
+              [ -f "$FILE" ] || continue
+              BASENAME=$(basename "$FILE")
+              # 提取关键类型信息
+              if [[ "$BASENAME" == *sysupgrade* ]]; then
+                TYPE="sysupgrade"
+              elif [[ "$BASENAME" == *factory* ]]; then
+                TYPE="factory"  
+              else
+                TYPE="firmware"
+              fi
+              # 提取扩展名
+              EXT="${BASENAME##*.}"
+              [[ "$BASENAME" == *.img.gz ]] && EXT="img.gz"
+              
+              NEW_FILE="immortalwrt-$WRT_CONFIG-$TYPE-$WRT_DATE.$EXT"
+              cp "$FILE" "./upload/$NEW_FILE"
             done
-            
+
             # 直接打包整个bin目录
             [ -d ./bin/ ] && tar -czf ./upload/immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".tar.gz -C . bin/
             make clean -j$(nproc)
