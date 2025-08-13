@@ -220,14 +220,19 @@ jobs:
       - name: Package Firmware
         run: |
           cd ./wrt/ && mkdir -p ./upload/
-
           cp -f ./.config ./upload/Config-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".txt
-
+          
           if [[ $WRT_TEST != 'true' ]]; then
-            echo "WRT_KVER=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^kernel - \K[\d\.]+' {} \; | head -1)" >> $GITHUB_ENV
-            echo "WRT_LIST=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | sort -u | tr '\n' ' ')" >> $GITHUB_ENV
+            # 分步处理，避免复杂的嵌套
+            KVER=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^kernel - \K[\d\.]+' {} \; | head -1)
+            echo "WRT_KVER=${KVER:-none}" >> $GITHUB_ENV
+            
+            LIST=$(find ./bin/targets/ -type f -name '*.manifest' -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | sort -u | tr '\n' ' ')
+            echo "WRT_LIST=${LIST:-none}" >> $GITHUB_ENV
+            
             # 获取已编译固件（CONFIG_PACKAGE_xxx=m）
-            echo "WRT_MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')" >> $GITHUB_ENV
+            MODS=$(grep '^CONFIG_PACKAGE_luci-\(app\|theme\)[^=]*=m$' ./.config | sed 's/^CONFIG_PACKAGE_//g; s/=m$//g' | sort | tr '\n' ' ')
+            echo "WRT_MODS=${MODS:-none}" >> $GITHUB_ENV
             
             # 复制固件文件到upload目录并重命名
             for FILE in ./bin/targets/*/*/*.{img.gz,bin,img} 2>/dev/null; do
@@ -249,6 +254,7 @@ jobs:
               NEW_NAME="immortalwrt-$WRT_INFO-$TYPE-$WRT_DATE.$EXT"
               cp "$FILE" "./upload/$NEW_NAME"
             done
+            
             # 直接打包整个bin目录
             [ -d ./bin/ ] && tar -czf ./upload/immortalwrt-"$WRT_CONFIG"-Photonicat-"$WRT_NAME"-"$WRT_DATE".tar.gz -C . bin/
             make clean -j$(nproc)
