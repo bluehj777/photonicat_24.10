@@ -184,49 +184,7 @@ jobs:
         if: env.WRT_TEST != 'true'
         run: |
           cd ./wrt/
-
-          echo "=== Starting compilation ==="
-          free -h
-          df -h /mnt
-          echo "=========================="
-
-          # 编译固件，正确检测失败状态
-          if ! make -j1 V=s 2>&1 | tee build.log; then
-            echo ""
-            echo "=== COMPILATION FAILED ==="
-            
-            # 显示最后的错误信息
-            echo "=== Last 50 lines ==="
-            tail -50 build.log
-            
-            echo ""
-            echo "=== All errors found ==="
-            grep -n -i "error" build.log | tail -20
-            
-            echo ""
-            echo "=== Package installation errors ==="
-            grep -A5 -B5 "Installing.*failed\|Error installing\|errors;" build.log
-            
-            echo ""
-            echo "=== Looking for the 3 failed packages ==="
-            # 查找"3 errors"附近的内容
-            grep -B20 -A10 "3 errors" build.log || echo "Could not find '3 errors' context"
-            
-            echo ""
-            echo "=== APK/Package manager specific errors ==="
-            grep -i "apk.*error\|package.*error\|dependency.*error" build.log || echo "No APK errors found"
-            
-            echo ""
-            echo "=== System status ==="
-            free -h
-            df -h /mnt
-            
-            echo ""
-            echo "=== COMPILATION STOPPED - NEED TO FIX THE 3 FAILED PACKAGES ==="
-            exit 1
-          fi
-          
-          echo "=== COMPILATION COMPLETED SUCCESSFULLY ==="
+          make -j1 V=s
 
       - name: Machine Information
         run: |
