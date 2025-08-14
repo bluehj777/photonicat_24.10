@@ -29,3 +29,4 @@ CONFIG_PACKAGE_kmod-ath10k=y
 CONFIG_PACKAGE_ath10k-firmware-qca9377=y
 CONFIG_PACKAGE_ath10k-firmware-qca9377-sdio=y
 CONFIG_PACKAGE_ath10k-board-qca9377=y
+CONFIG_PACKAGE_ath10k-board-qca9377-sdio=y
