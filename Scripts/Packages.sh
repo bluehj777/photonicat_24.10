@@ -74,6 +74,7 @@ UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-timewol luci-ap
 UPDATE_PACKAGE "luci-app-xupnpd" "jarod360/luci-app-xupnpd" "main"
 UPDATE_PACKAGE "luci-app-onliner" "bluehj777/openwrt_pkgs" "main" "pkg"
 UPDATE_PACKAGE "luci-app-socat" "bluehj777/openwrt_pkgs" "main" "pkg"
+UPDATE_PACKAGE "luci-app-gpoint" "Kodo-kakaku/luci-app-gpoint" "main"
 #UPDATE_PACKAGE "pcat-manager" "ntbowen/pcat-manager" "main"
 #UPDATE_PACKAGE "luci-mod-photonicatstatus" "ntbowen/luci-mod-photonicatstatus" "main"
 
