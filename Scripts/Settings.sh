@@ -108,3 +108,38 @@ fi
 	fi
 	echo "IPK package management has been enabled!"
 #fi
+
+#添加QCA9377热插拔修复脚本
+QCA9377_HOTPLUG_DIR="./package/base-files/files/etc/hotplug.d/ieee80211"
+QCA9377_SCRIPT_FILE="$QCA9377_HOTPLUG_DIR/12-qca9377-trigger"
+
+# 创建目录
+mkdir -p "$QCA9377_HOTPLUG_DIR"
+
+# 创建脚本文件
+cat > "$QCA9377_SCRIPT_FILE" << 'EOF'
+#!/bin/sh
+[ "${ACTION}" = "add" ] || exit 0
+
+# 检查是否是ath10k_sdio设备且设备名是phy1
+if [ "$DEVICENAME" = "phy1" ] && grep -q "DRIVER=ath10k_sdio" /sys/$DEVPATH/device/uevent 2>/dev/null; then
+    # 等待设备稳定
+    sleep 1
+    
+    # 启用radio1
+    uci set wireless.radio1.disabled='0'
+    uci commit wireless
+    
+    # 重启radio1
+    wifi down radio1
+    sleep 1
+    wifi up radio1
+    
+    logger -t "qca9377-hotplug" "QCA9377 phy1 auto-started"
+fi
+EOF
+
+# 设置可执行权限
+chmod +x "$QCA9377_SCRIPT_FILE"
+
+echo "QCA9377 hotplug script has been added!"
