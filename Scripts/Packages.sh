@@ -131,5 +131,6 @@ UPDATE_VERSION() {
 
 # 在脚本末尾，修改sing-box的调用
 #UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否" "指定版本，可选"
-UPDATE_VERSION "sing-box" "false" "1.11.15"  # 指定更新到1.11.15版本
+#UPDATE_VERSION "sing-box" "false" "1.11.15"  # 指定更新到1.11.15版本
+UPDATE_VERSION "sing-box"
 UPDATE_VERSION "tailscale"  # tailscale保持更新到最新版本
