@@ -56,7 +56,6 @@ CONFIG_PACKAGE_luci-app-nikki=m
 CONFIG_PACKAGE_luci-app-uhttpd=y
 CONFIG_PACKAGE_luci-app-xupnpd=m
 CONFIG_PACKAGE_luci-app-msd_lite=m
-CONFIG_PACKAGE_luci-app-gpoint=m
 
 #删除插件
 CONFIG_PACKAGE_luci-app-wol=n
