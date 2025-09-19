@@ -94,20 +94,30 @@ fi
 #fi
 
 #IPK/APK包管理调整
-#if [[ $WRT_USEAPK == 'true' ]]; then
-#	echo "CONFIG_USE_APK=y" >> ./.config
-#	echo "APK package management has been enabled!"
-#else
-	echo "CONFIG_USE_APK=n" >> ./.config
-	echo "CONFIG_PACKAGE_default-settings-chn=y" >> ./.config
-	DEFAULT_CN_FILE=./package/emortal/default-settings/files/99-default-settings-chinese
-	if [ -f "$DEFAULT_CN_FILE" ]; then
-		sed -i.bak "/^exit 0/r $GITHUB_WORKSPACE/Scripts/patches/99-default-settings-chinese" $DEFAULT_CN_FILE
-		sed -i '/^exit 0/d' $DEFAULT_CN_FILE && echo "exit 0" >> $DEFAULT_CN_FILE
-		echo "99-default-settings-chinese patch has been applied!"
-	fi
-	echo "IPK package management has been enabled!"
-#fi
+echo "CONFIG_USE_APK=n" >> ./.config
+echo "CONFIG_PACKAGE_default-settings-chn=y" >> ./.config
+DEFAULT_CN_FILE=./package/emortal/default-settings/files/99-default-settings-chinese
+if [ -f "$DEFAULT_CN_FILE" ]; then
+	sed -i.bak "/^exit 0/r $GITHUB_WORKSPACE/Scripts/patches/99-default-settings-chinese" $DEFAULT_CN_FILE
+	sed -i '/^exit 0/d' $DEFAULT_CN_FILE && echo "exit 0" >> $DEFAULT_CN_FILE
+	echo "99-default-settings-chinese patch has been applied!"
+fi
+echo "IPK package management has been enabled!"
+
+# 修改uhttpd RSA 密钥长度
+uhttpd_config_file="./package/network/services/uhttpd/files/uhttpd.config"
+if [ -f "$uhttpd_config_file" ]; then
+    sed -i 's/option bits\t\t256/option bits\t\t1024/' "$uhttpd_config_file"
+    # 验证修改是否成功
+    if grep -q "option bits.*1024" "$uhttpd_config_file"; then
+        echo "The length of the uhttpd RSA key has been successfully changed to 1024 bits"
+    else
+        echo "The uhttpd configuration may fail to be modified"
+    fi
+else
+    echo "The uhttpd configuration file is not found $uhttpd_config_file"
+fi
+echo "The uhttpd configuration has been modified!"
 
 #添加QCA9377热插拔修复脚本
 QCA9377_HOTPLUG_DIR="./package/base-files/files/etc/hotplug.d/ieee80211"
