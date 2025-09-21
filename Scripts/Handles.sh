@@ -104,6 +104,30 @@ if [ -f "$DDNS_OVERVIEW_FILE" ]; then
 	cd $PKG_PATH && echo "DDNS log display has been fixed!"
 fi
 
+# 替换Rust包为兼容版本
+if [ -d "../feeds/packages/lang/rust" ]; then
+    echo "Replacing rust package with compatible version..."
+    rm -rf "../feeds/packages/lang/rust"
+    
+    # 下载24.10分支的rust包
+    TEMP_DIR="/tmp/packages-24.10"
+    rm -rf "$TEMP_DIR"
+    
+    git clone --depth=1 --single-branch --branch openwrt-24.10 \
+        https://github.com/immortalwrt/packages.git "$TEMP_DIR"
+    
+    cp -r "$TEMP_DIR/lang/rust" "../feeds/packages/lang/"
+    rm -rf "$TEMP_DIR"
+    
+    echo "rust package has been replaced with 24.10 version!"
+    
+    # 重新安装rust包
+    echo "Reinstalling rust package..."
+    cd ..
+    ./scripts/feeds install -p packages rust
+    cd "$PKG_PATH"
+fi
+
 #修复Rust编译失败
 RUST_FILE=$(find ../feeds/packages/ -maxdepth 3 -type f -wholename "*/rust/Makefile")
 if [ -f "$RUST_FILE" ]; then
