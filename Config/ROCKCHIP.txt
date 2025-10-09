@@ -29,7 +29,7 @@ CONFIG_PACKAGE_pcat-mgr=y
 
 #高通Wifi驱动固件添加调整
 # ATH10K驱动支持
-CONFIG_PACKAGE_kmod-ath10k-sdio=y
+#CONFIG_PACKAGE_kmod-ath10k-sdio=n
 # ATH11K驱动支持
 CONFIG_PACKAGE_kmod-ath11k=y
 CONFIG_PACKAGE_kmod-ath11k-pci=y
@@ -40,8 +40,8 @@ CONFIG_PACKAGE_kmod-ath12k=y
 # ATH10K固件
 CONFIG_PACKAGE_ath10k-firmware-qca9377-photonicat=y
 CONFIG_PACKAGE_ath10k-board-qca9377-photonicat=y
-CONFIG_PACKAGE_ath10k-board-qca9377-sdio is not set
-CONFIG_PACKAGE_ath10k-firmware-qca9377-sdio is not set
+CONFIG_PACKAGE_ath10k-board-qca9377-sdio=n
+CONFIG_PACKAGE_ath10k-firmware-qca9377-sdio=n
 # ATH11K固件
 CONFIG_PACKAGE_ath11k-firmware-ipq6018=y
 CONFIG_PACKAGE_ath11k-firmware-ipq8074=y
